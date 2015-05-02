@@ -1,5 +1,5 @@
-from sparse_lib.sparse.sparse_mat cimport unexposed_value
-from sparse_lib.sparse.ll_mat cimport LLSparseMatrix
+from cysparse.sparse.sparse_mat cimport unexposed_value
+from cysparse.sparse.ll_mat cimport LLSparseMatrix
 
 from libc.stdio cimport *
 from libc.string cimport *

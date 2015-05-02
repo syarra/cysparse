@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-from sparse_lib.cysparse_types cimport *
+from cysparse.cysparse_types cimport *
 
 from collections import OrderedDict
 import sys

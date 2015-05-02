@@ -3,11 +3,11 @@ Write MatrixMarket format matrices.
 
 See http://math.nist.gov/MatrixMarket/
 """
-from sparse_lib.cysparse_types cimport *
+from cysparse.cysparse_types cimport *
 
-from sparse_lib.sparse.ll_mat cimport LLSparseMatrix
+from cysparse.sparse.ll_mat cimport LLSparseMatrix
 
-from sparse_lib.utils.time_utils import time_stamp
+from cysparse.utils.time_utils import time_stamp
 
 
 cdef MakeMMFileFromSparseMatrix(str mm_filename, LLSparseMatrix A):

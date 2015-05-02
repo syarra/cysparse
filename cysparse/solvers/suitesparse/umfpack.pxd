@@ -1,7 +1,7 @@
-from sparse_lib.cysparse_types cimport *
+from cysparse.cysparse_types cimport *
 
-from sparse_lib.sparse.ll_mat cimport LLSparseMatrix
-from sparse_lib.sparse.csc_mat cimport CSCSparseMatrix
+from cysparse.sparse.ll_mat cimport LLSparseMatrix
+from cysparse.sparse.csc_mat cimport CSCSparseMatrix
 
 
 cdef extern from "umfpack.h":

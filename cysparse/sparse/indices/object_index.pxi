@@ -15,7 +15,7 @@ Indices can be given in **any** order or **repeated**.
 Numpy arrays can be strided or not.
 """
 
-from sparse_lib.cysparse_types cimport *
+from cysparse.cysparse_types cimport *
 
 cdef extern from "Python.h":
     # *** Types ***

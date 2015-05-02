@@ -3,14 +3,14 @@ Lightweight object to view a :class:`LLSparseMatrix`.
 
 
 """
-from sparse_lib.cysparse_types cimport *
+from cysparse.cysparse_types cimport *
 
 # forward declaration
 cdef class LLSparseMatrixView
 
-from sparse_lib.sparse.sparse_mat cimport unexposed_value
-from sparse_lib.sparse.ll_mat cimport LLSparseMatrix
-from sparse_lib.utils.equality cimport values_are_equal
+from cysparse.sparse.sparse_mat cimport unexposed_value
+from cysparse.sparse.ll_mat cimport LLSparseMatrix
+from cysparse.utils.equality cimport values_are_equal
 
 from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 from cpython cimport PyObject

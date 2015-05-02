@@ -5,9 +5,9 @@ Condensed Sparse Column (CSC) Format Matrices.
 """
 from __future__ import print_function
 
-from sparse_lib.cysparse_types cimport *
+from cysparse.cysparse_types cimport *
 
-from sparse_lib.sparse.sparse_mat cimport ImmutableSparseMatrix, unexposed_value
+from cysparse.sparse.sparse_mat cimport ImmutableSparseMatrix, unexposed_value
 
 
 from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free

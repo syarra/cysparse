@@ -6,11 +6,11 @@ Condensed Sparse Row (CSR) Format Matrices.
 
 from __future__ import print_function
 
-from sparse_lib.cysparse_types cimport *
+from cysparse.cysparse_types cimport *
 
-from sparse_lib.sparse.sparse_mat cimport ImmutableSparseMatrix, MutableSparseMatrix, unexposed_value
-from sparse_lib.sparse.ll_mat cimport LLSparseMatrix
-from sparse_lib.sparse.csc_mat cimport CSCSparseMatrix
+from cysparse.sparse.sparse_mat cimport ImmutableSparseMatrix, MutableSparseMatrix, unexposed_value
+from cysparse.sparse.ll_mat cimport LLSparseMatrix
+from cysparse.sparse.csc_mat cimport CSCSparseMatrix
 
 from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 from cpython cimport PyObject

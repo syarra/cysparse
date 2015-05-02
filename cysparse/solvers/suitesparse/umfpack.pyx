@@ -1,10 +1,10 @@
-from sparse_lib.cysparse_types cimport *
+from cysparse.cysparse_types cimport *
 
 assert FLOAT_T == FLOAT64_T, "UMFPACK only deals with double precision (FLOAT64)"
 
-from sparse_lib.sparse.ll_mat cimport LLSparseMatrix
-from sparse_lib.sparse.csr_mat cimport CSRSparseMatrix, MakeCSRSparseMatrix
-from sparse_lib.sparse.csc_mat cimport CSCSparseMatrix, MakeCSCSparseMatrix
+from cysparse.sparse.ll_mat cimport LLSparseMatrix
+from cysparse.sparse.csr_mat cimport CSRSparseMatrix, MakeCSRSparseMatrix
+from cysparse.sparse.csc_mat cimport CSCSparseMatrix, MakeCSCSparseMatrix
 
 from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 

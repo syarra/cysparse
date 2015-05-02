@@ -1,4 +1,4 @@
-from sparse_lib.sparse.ll_mat cimport LLSparseMatrix
+from cysparse.sparse.ll_mat cimport LLSparseMatrix
 
 from libc.stdio cimport *
 

@@ -1,8 +1,8 @@
-from sparse_lib.cysparse_types cimport *
+from cysparse.cysparse_types cimport *
 
-from sparse_lib.sparse.sparse_mat cimport ImmutableSparseMatrix
-from sparse_lib.sparse.ll_mat cimport LLSparseMatrix
-from sparse_lib.sparse.csc_mat cimport CSCSparseMatrix
+from cysparse.sparse.sparse_mat cimport ImmutableSparseMatrix
+from cysparse.sparse.ll_mat cimport LLSparseMatrix
+from cysparse.sparse.csc_mat cimport CSCSparseMatrix
 
 cdef class CSRSparseMatrix(ImmutableSparseMatrix):
     """

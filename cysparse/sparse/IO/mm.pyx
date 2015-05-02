@@ -1,4 +1,4 @@
-from sparse_lib.cysparse_types cimport *
+from cysparse.cysparse_types cimport *
 
 cdef:
     str MM_MATRIX_MARKET_BANNER_STR = "%%MatrixMarket"

@@ -3,10 +3,10 @@
 {{GENERIC TYPES: YES}}
 """
 
-from sparse_lib.cysparse_types cimport *
+from cysparse.cysparse_types cimport *
 
-from sparse_lib.sparse.sparse_mat cimport MutableSparseMatrix
-from sparse_lib.sparse.ll_mat_view cimport LLSparseMatrixView
+from cysparse.sparse.sparse_mat cimport MutableSparseMatrix
+from cysparse.sparse.ll_mat_view cimport LLSparseMatrixView
 
 cimport numpy as cnp
 

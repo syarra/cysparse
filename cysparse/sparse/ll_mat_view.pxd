@@ -1,9 +1,9 @@
-from sparse_lib.cysparse_types cimport *
+from cysparse.cysparse_types cimport *
 
 # forward declaration
 cdef class LLSparseMatrixView
 
-from sparse_lib.sparse.ll_mat cimport LLSparseMatrix
+from cysparse.sparse.ll_mat cimport LLSparseMatrix
 
 from cpython cimport PyObject
 

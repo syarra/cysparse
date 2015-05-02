@@ -1,4 +1,4 @@
-from sparse_lib.cysparse_types cimport *
+from cysparse.cysparse_types cimport *
 
 cdef INT_t MUTABLE_SPARSE_MAT_DEFAULT_SIZE_HINT = 40        # allocated size by default
 
