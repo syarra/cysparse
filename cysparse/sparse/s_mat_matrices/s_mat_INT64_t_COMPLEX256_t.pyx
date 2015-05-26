@@ -1,10 +1,10 @@
 from cysparse.types.cysparse_types cimport *
-from cysparse.sparse.sparse_mat cimport SparseMatrix, unexposed_value, MUTABLE_SPARSE_MAT_DEFAULT_SIZE_HINT
+from cysparse.sparse.s_mat cimport SparseMatrix, unexposed_value, MUTABLE_SPARSE_MAT_DEFAULT_SIZE_HINT
 
 ########################################################################################################################
 # BASE MATRIX CLASS
 ########################################################################################################################
-cdef class SparseMatrix_INT32_t_COMPLEX128_t(SparseMatrix):
+cdef class SparseMatrix_INT64_t_COMPLEX256_t(SparseMatrix):
 
     def __cinit__(self, **kwargs):
         """
@@ -14,7 +14,7 @@ cdef class SparseMatrix_INT32_t_COMPLEX128_t(SparseMatrix):
         """
         assert unexposed_value == kwargs.get('control_object', None), "Matrix must be instantiated with a factory method"
 
-        self.type_name = "SparseMatrix_INT32_t"
+        self.type_name = "SparseMatrix_INT64_t"
 
         self.nrow = kwargs.get('nrow', -1)
         self.ncol = kwargs.get('ncol', -1)
@@ -31,7 +31,7 @@ cdef class SparseMatrix_INT32_t_COMPLEX128_t(SparseMatrix):
         Note:
             This method only returns the internal memory used for the C-arrays, **not** the whole object.
         """
-        return COMPLEX128_t_BIT * self.nrow * self.ncol
+        return COMPLEX256_t_BIT * self.nrow * self.ncol
 
     def memory_real(self):
         """
@@ -48,7 +48,7 @@ cdef class SparseMatrix_INT32_t_COMPLEX128_t(SparseMatrix):
 
 
         """
-        return COMPLEX128_t_BIT
+        return COMPLEX256_t_BIT
 
     ####################################################################################################################
     # OUTPUT STRINGS
@@ -106,7 +106,7 @@ cdef class SparseMatrix_INT32_t_COMPLEX128_t(SparseMatrix):
 ########################################################################################################################
 # BASE MUTABLE MATRIX CLASS
 ########################################################################################################################
-cdef class MutableSparseMatrix_INT32_t_COMPLEX128_t(SparseMatrix_INT32_t_COMPLEX128_t):
+cdef class MutableSparseMatrix_INT64_t_COMPLEX256_t(SparseMatrix_INT64_t_COMPLEX256_t):
     def __cinit__(self, **kwargs):
         """
 
@@ -122,7 +122,7 @@ cdef class MutableSparseMatrix_INT32_t_COMPLEX128_t(SparseMatrix_INT32_t_COMPLEX
 ########################################################################################################################
 # BASE IMMUTABLE MATRIX CLASS
 ########################################################################################################################
-cdef class ImmutableSparseMatrix_INT32_t_COMPLEX128_t(SparseMatrix_INT32_t_COMPLEX128_t):
+cdef class ImmutableSparseMatrix_INT64_t_COMPLEX256_t(SparseMatrix_INT64_t_COMPLEX256_t):
     def __cinit__(self, **kwargs):
         """
 

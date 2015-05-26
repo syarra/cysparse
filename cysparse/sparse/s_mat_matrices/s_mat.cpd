@@ -1,5 +1,5 @@
 from cysparse.types.cysparse_types cimport *
-from cysparse.sparse.sparse_mat cimport SparseMatrix
+from cysparse.sparse.s_mat cimport SparseMatrix
 
 
 cdef class SparseMatrix_@index@_@type@(SparseMatrix):
