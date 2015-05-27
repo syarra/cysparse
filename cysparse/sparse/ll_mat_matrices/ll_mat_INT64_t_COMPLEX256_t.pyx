@@ -10,9 +10,9 @@ from cysparse.sparse.ll_mat cimport LL_MAT_INCREASE_FACTOR
 from cysparse.sparse.s_mat cimport unexposed_value
 from cysparse.types.cysparse_numpy_types import are_mixed_types_compatible, cysparse_to_numpy_type
 from cysparse.sparse.ll_mat cimport PyLLSparseMatrix_Check, LL_MAT_PPRINT_COL_THRESH, LL_MAT_PPRINT_ROW_THRESH
-from cysparse.sparse.s_mat_matrices.s_mat_@index@_@type@ cimport MutableSparseMatrix_@index@_@type@
-from cysparse.sparse.ll_mat_matrices.ll_mat_@index@_@type@ cimport LLSparseMatrix_@index@_@type@
-from cysparse.sparse.ll_mat_views.ll_mat_view_@index@_@type@ cimport LLSparseMatrixView_@index@_@type@
+from cysparse.sparse.s_mat_matrices.s_mat_INT64_t_COMPLEX256_t cimport MutableSparseMatrix_INT64_t_COMPLEX256_t
+from cysparse.sparse.ll_mat_matrices.ll_mat_INT64_t_COMPLEX256_t cimport LLSparseMatrix_INT64_t_COMPLEX256_t
+from cysparse.sparse.ll_mat_views.ll_mat_view_INT64_t_COMPLEX256_t cimport LLSparseMatrixView_INT64_t_COMPLEX256_t
 
 
 
@@ -21,15 +21,15 @@ from cysparse.sparse.ll_mat_views.ll_mat_view_@index@_@type@ cimport LLSparseMat
 #from cysparse.utils.equality cimport values_are_equal
 #from cysparse.sparse.IO.mm cimport MakeLLSparseMatrixFromMMFile2, MakeMMFileFromSparseMatrix
 
-from cysparse.sparse.sparse_utils.generate_indices_@index@ cimport create_c_array_indices_from_python_object_@index@
+from cysparse.sparse.sparse_utils.generate_indices_INT64_t cimport create_c_array_indices_from_python_object_INT64_t
 
 ########################################################################################################################
 # CySparse include
 ########################################################################################################################
 # pxi files should come last (except for circular dependencies)
-include "ll_mat_kernel/ll_mat_assignment_kernel_@index@_@type@.pxi"
-include "ll_mat_kernel/ll_mat_multiplication_by_numpy_vector_kernel_@index@_@type@.pxi"
-include "ll_mat_helpers/ll_mat_multiplication_@index@_@type@.pxi"
+include "ll_mat_kernel/ll_mat_assignment_kernel_INT64_t_COMPLEX256_t.pxi"
+include "ll_mat_kernel/ll_mat_multiplication_by_numpy_vector_kernel_INT64_t_COMPLEX256_t.pxi"
+include "ll_mat_helpers/ll_mat_multiplication_INT64_t_COMPLEX256_t.pxi"
 
 
 ########################################################################################################################
@@ -79,13 +79,13 @@ cdef extern from "complex.h":
 ########################################################################################################################
 # CySparse cimport/import to avoid circular dependencies
 ########################################################################################################################
-from cysparse.sparse.ll_mat_views.ll_mat_view_@index@_@type@ cimport LLSparseMatrixView_@index@_@type@, MakeLLSparseMatrixView_@index@_@type@
+from cysparse.sparse.ll_mat_views.ll_mat_view_INT64_t_COMPLEX256_t cimport LLSparseMatrixView_INT64_t_COMPLEX256_t, MakeLLSparseMatrixView_INT64_t_COMPLEX256_t
 
 
 ########################################################################################################################
 # CLASS LLSparseMatrix
 ########################################################################################################################
-cdef class LLSparseMatrix_@index@_@type@(MutableSparseMatrix_@index@_@type@):
+cdef class LLSparseMatrix_INT64_t_COMPLEX256_t(MutableSparseMatrix_INT64_t_COMPLEX256_t):
     """
     Linked-List Format matrix.
 
@@ -106,33 +106,33 @@ cdef class LLSparseMatrix_@index@_@type@(MutableSparseMatrix_@index@_@type@):
             raise ValueError('size_hint (%d) must be >= 1' % self.size_hint)
 
         self.type = "LLSparseMatrix"
-        self.type_name = "LLSparseMatrix [@index@, @type@]"
+        self.type_name = "LLSparseMatrix [INT64_t, COMPLEX256_t]"
 
         # This is particular to the LLSparseMatrix type
         # Do we allocate memory here or
         # do we let another factory method do it for us?
         no_memory = kwargs.get('no_memory', False)
 
-        cdef @index@ i
+        cdef INT64_t i
 
         if not no_memory:
 
-            val = <@type@ *> PyMem_Malloc(self.size_hint * sizeof(@type@))
+            val = <COMPLEX256_t *> PyMem_Malloc(self.size_hint * sizeof(COMPLEX256_t))
             if not val:
                 raise MemoryError()
             self.val = val
 
-            col = <@index@ *> PyMem_Malloc(self.size_hint * sizeof(@index@))
+            col = <INT64_t *> PyMem_Malloc(self.size_hint * sizeof(INT64_t))
             if not col:
                 raise MemoryError()
             self.col = col
 
-            link = <@index@ *> PyMem_Malloc(self.size_hint * sizeof(@index@))
+            link = <INT64_t *> PyMem_Malloc(self.size_hint * sizeof(INT64_t))
             if not link:
                 raise MemoryError()
             self.link = link
 
-            root = <@index@ *> PyMem_Malloc(self.nrow * sizeof(@index@))
+            root = <INT64_t *> PyMem_Malloc(self.nrow * sizeof(INT64_t))
             if not root:
                 raise MemoryError()
             self.root = root
@@ -151,7 +151,7 @@ cdef class LLSparseMatrix_@index@_@type@(MutableSparseMatrix_@index@_@type@):
         PyMem_Free(self.link)
         PyMem_Free(self.root)
 
-    cdef _realloc(self, @index@ nalloc_new):
+    cdef _realloc(self, INT64_t nalloc_new):
         """
         Realloc space for the internal arrays.
 
@@ -162,20 +162,20 @@ cdef class LLSparseMatrix_@index@_@type@(MutableSparseMatrix_@index@_@type@):
         cdef:
             void *temp
 
-        temp = <@index@ *> PyMem_Realloc(self.col, nalloc_new * sizeof(@index@))
+        temp = <INT64_t *> PyMem_Realloc(self.col, nalloc_new * sizeof(INT64_t))
         if not temp:
             raise MemoryError()
-        self.col = <@index@*>temp
+        self.col = <INT64_t*>temp
 
-        temp = <@index@ *> PyMem_Realloc(self.link, nalloc_new * sizeof(@index@))
+        temp = <INT64_t *> PyMem_Realloc(self.link, nalloc_new * sizeof(INT64_t))
         if not temp:
             raise MemoryError()
-        self.link = <@index@ *>temp
+        self.link = <INT64_t *>temp
 
-        temp = <@type@ *> PyMem_Realloc(self.val, nalloc_new * sizeof(@type@))
+        temp = <COMPLEX256_t *> PyMem_Realloc(self.val, nalloc_new * sizeof(COMPLEX256_t))
         if not temp:
             raise MemoryError()
-        self.val = <@type@ *>temp
+        self.val = <COMPLEX256_t *>temp
 
         self.nalloc = nalloc_new
 
@@ -188,7 +188,7 @@ cdef class LLSparseMatrix_@index@_@type@(MutableSparseMatrix_@index@_@type@):
 
         """
         assert LL_MAT_INCREASE_FACTOR > 1.0
-        cdef @index@ real_new_alloc = <@index@>(<FLOAT64_t>LL_MAT_INCREASE_FACTOR * self.nalloc) + 1
+        cdef INT64_t real_new_alloc = <INT64_t>(<FLOAT64_t>LL_MAT_INCREASE_FACTOR * self.nalloc) + 1
 
         return self._realloc(real_new_alloc)
 
@@ -198,7 +198,7 @@ cdef class LLSparseMatrix_@index@_@type@(MutableSparseMatrix_@index@_@type@):
 
         """
         cdef:
-            @index@ i, k, k_next, k_last, k_new, nalloc_new;
+            INT64_t i, k, k_next, k_last, k_new, nalloc_new;
 
         nalloc_new = self.nnz  # new size for val, col and link arrays
 
@@ -251,16 +251,16 @@ cdef class LLSparseMatrix_@index@_@type@(MutableSparseMatrix_@index@_@type@):
             needed to store the matrix).
 
         """
-        cdef @index@ total_memory = 0
+        cdef INT64_t total_memory = 0
 
         # root
-        total_memory += self.nrow * sizeof(@index@)
+        total_memory += self.nrow * sizeof(INT64_t)
         # col
-        total_memory += self.nalloc * sizeof(@index@)
+        total_memory += self.nalloc * sizeof(INT64_t)
         # link
-        total_memory += self.nalloc * sizeof(@index@)
+        total_memory += self.nalloc * sizeof(INT64_t)
         # val
-        total_memory += self.nalloc * sizeof(@type@)
+        total_memory += self.nalloc * sizeof(COMPLEX256_t)
 
         return total_memory
 
@@ -273,23 +273,23 @@ cdef class LLSparseMatrix_@index@_@type@(MutableSparseMatrix_@index@_@type@):
     cdef create_submatrix(self, PyObject* obj1, PyObject* obj2):
         raise NotImplementedError("Not implemented yet...")
         cdef:
-            @index@ nrow
-            @index@ * row_indices,
-            @index@ ncol
-            @index@ * col_indices
-            @index@ i, j
+            INT64_t nrow
+            INT64_t * row_indices,
+            INT64_t ncol
+            INT64_t * col_indices
+            INT64_t i, j
 
-        row_indices = create_c_array_indices_from_python_object_@index@(self.nrow, obj1, &nrow)
-        col_indices = create_c_array_indices_from_python_object_@index@(self.ncol, obj2, &ncol)
+        row_indices = create_c_array_indices_from_python_object_INT64_t(self.nrow, obj1, &nrow)
+        col_indices = create_c_array_indices_from_python_object_INT64_t(self.ncol, obj2, &ncol)
 
     ####################################################################################################################
     #                                            ### ASSIGN ###
-    cdef assign(self, LLSparseMatrixView_@index@_@type@ view, object obj):
+    cdef assign(self, LLSparseMatrixView_INT64_t_COMPLEX256_t view, object obj):
         """
         Set ``A[..., ...] = obj`` directly.
 
         Args:
-            view: An ``LLSparseMatrixView_@index@_@type@`` that points to this matrix (``self``).
+            view: An ``LLSparseMatrixView_INT64_t_COMPLEX256_t`` that points to this matrix (``self``).
             obj: Any Python object that implements ``__getitem__()`` and accepts a ``tuple`` ``(i, j)``.
 
         Note:
@@ -306,13 +306,13 @@ cdef class LLSparseMatrix_@index@_@type@(MutableSparseMatrix_@index@_@type@):
 
         # VIEW
         cdef:
-            @index@ * row_indices = view.row_indices
-            @index@ nrow = view.nrow
-            @index@ * col_indices = view.col_indices
-            @index@ ncol = view.ncol
+            INT64_t * row_indices = view.row_indices
+            INT64_t nrow = view.nrow
+            INT64_t * col_indices = view.col_indices
+            INT64_t ncol = view.ncol
 
         cdef:
-            @index@ i, j
+            INT64_t i, j
 
         if self.is_symmetric:
             if PyLLSparseMatrix_Check(obj):
@@ -324,7 +324,7 @@ cdef class LLSparseMatrix_@index@_@type@(MutableSparseMatrix_@index@_@type@):
             else:
                 for i from 0 <= i < nrow:
                     for j from 0 <= j <= i:
-                        self.put(row_indices[i], col_indices[j], <@type@> obj[tuple(i, j)])
+                        self.put(row_indices[i], col_indices[j], <COMPLEX256_t> obj[tuple(i, j)])
 
         else:   # self.is_symmetric == False
 
@@ -337,13 +337,13 @@ cdef class LLSparseMatrix_@index@_@type@(MutableSparseMatrix_@index@_@type@):
             else:
                 for i from 0 <= i < nrow:
                     for j from 0 <= j < ncol:
-                        self.put(row_indices[i], col_indices[j], <@type@> obj[tuple(i, j)])
+                        self.put(row_indices[i], col_indices[j], <COMPLEX256_t> obj[tuple(i, j)])
 
     ####################################################################################################################
     # COUNTING ELEMENTS
     ####################################################################################################################
     # TODO: to be done
-    cdef count_nnz_from_indices(self, @index@ * row_indices,@index@ row_indices_length, @index@ * col_indices, @index@ col_indices_length):
+    cdef count_nnz_from_indices(self, INT64_t * row_indices,INT64_t row_indices_length, INT64_t * col_indices, INT64_t col_indices_length):
         """
         Counts the nnz specified by row and column indices.
 
@@ -360,7 +360,7 @@ cdef class LLSparseMatrix_@index@_@type@(MutableSparseMatrix_@index@_@type@):
     ####################################################################################################################
     ####################################################################################################################
     #                                            *** SET ***
-    cdef put(self, @index@ i, @index@ j, @type@ value):
+    cdef put(self, INT64_t i, INT64_t j, COMPLEX256_t value):
         """
         Set :math:`A[i, j] = \textrm{value}` directly.
 
@@ -378,7 +378,7 @@ cdef class LLSparseMatrix_@index@_@type@(MutableSparseMatrix_@index@_@type@):
         if self.is_symmetric and i < j:
             raise IndexError('Write operation to upper triangle of symmetric matrix not allowed')
 
-        cdef @index@ k, new_elem, last, col
+        cdef INT64_t k, new_elem, last, col
 
         # Find element to be set (or removed)
         col = last = -1
@@ -443,7 +443,7 @@ cdef class LLSparseMatrix_@index@_@type@(MutableSparseMatrix_@index@_@type@):
                 self.nnz -= 1
 
 
-    cdef int safe_put(self, @index@ i, @index@ j, @type@ value)  except -1:
+    cdef int safe_put(self, INT64_t i, INT64_t j, COMPLEX256_t value)  except -1:
         """
         Set ``A[i, j] = value`` directly.
 
@@ -462,7 +462,7 @@ cdef class LLSparseMatrix_@index@_@type@(MutableSparseMatrix_@index@_@type@):
 
     ####################################################################################################################
     #                                            *** GET ***
-    cdef @type@ at(self, @index@ i, @index@ j):
+    cdef COMPLEX256_t at(self, INT64_t i, INT64_t j):
         """
         Return element ``(i, j)``.
 
@@ -477,7 +477,7 @@ cdef class LLSparseMatrix_@index@_@type@(MutableSparseMatrix_@index@_@type@):
 
 
         """
-        cdef @index@ k, t
+        cdef INT64_t k, t
 
         if self.is_symmetric and i < j:
             t = i; i = j; j = t
@@ -502,11 +502,9 @@ cdef class LLSparseMatrix_@index@_@type@(MutableSparseMatrix_@index@_@type@):
         return 0
 
     # EXPLICIT TYPE TESTS
-{% if type in complex_list %}
-    cdef @type@ safe_at(self, @index@ i, @index@ j) except *:
-{% else %}
-    cdef @type@ safe_at(self, @index@ i, @index@ j) except? 1:
-{% endif %}
+
+    cdef COMPLEX256_t safe_at(self, INT64_t i, INT64_t j) except *:
+
         """
         Return element ``(i, j)`` but with check for out of bounds indices.
 
@@ -517,9 +515,9 @@ cdef class LLSparseMatrix_@index@_@type@(MutableSparseMatrix_@index@_@type@):
         """
         if not 0 <= i < self.nrow or not 0 <= j < self.ncol:
             raise IndexError("Index out of bounds")
-{% if type in complex_list %}
+
             return 1
-{% endif %}
+
         return self.at(i, j)
 
     ####################################################################################################################
@@ -548,8 +546,8 @@ cdef class LLSparseMatrix_@index@_@type@(MutableSparseMatrix_@index@_@type@):
         #    del view
         #    return
 
-        cdef @index@ i = key[0]
-        cdef @index@ j = key[1]
+        cdef INT64_t i = key[0]
+        cdef INT64_t j = key[1]
 
         self.safe_put(i, j, value)
 
@@ -576,15 +574,15 @@ cdef class LLSparseMatrix_@index@_@type@(MutableSparseMatrix_@index@_@type@):
         if len(key) != 2:
             raise IndexError('Index tuple must be of length 2 (not %d)' % len(key))
 
-        cdef LLSparseMatrixView_@index@_@type@ view
+        cdef LLSparseMatrixView_INT64_t_COMPLEX256_t view
 
         # test for direct access (i.e. both elements are integers)
         if not PyInt_Check(<PyObject *>key[0]) or not PyInt_Check(<PyObject *>key[1]):
-            view =  MakeLLSparseMatrixView_@index@_@type@(self, <PyObject *>key[0], <PyObject *>key[1])
+            view =  MakeLLSparseMatrixView_INT64_t_COMPLEX256_t(self, <PyObject *>key[0], <PyObject *>key[1])
             return view
 
-        cdef @index@ i = key[0]
-        cdef @index@ j = key[1]
+        cdef INT64_t i = key[0]
+        cdef INT64_t j = key[1]
 
         return self.safe_at(i, j)
 
@@ -622,7 +620,7 @@ cdef class LLSparseMatrix_@index@_@type@(MutableSparseMatrix_@index@_@type@):
         cdef:
             #list list_container
             PyObject *list_p # the list that will hold the keys
-            @index@ i, j, k
+            INT64_t i, j, k
             Py_ssize_t pos = 0    # position in list
 
         if not self.is_symmetric:
@@ -650,7 +648,7 @@ cdef class LLSparseMatrix_@index@_@type@(MutableSparseMatrix_@index@_@type@):
         """
         cdef:
             PyObject *list_p   # the list that will hold the values
-            @index@ i, k
+            INT64_t i, k
             Py_ssize_t pos = 0        # position in list
 
         if not self.is_symmetric:
@@ -663,31 +661,10 @@ cdef class LLSparseMatrix_@index@_@type@(MutableSparseMatrix_@index@_@type@):
             for i from 0<= i < self.nrow:
                 k = self.root[i]
                 while k != -1:
-{% if type == 'INT32_t' %}
-                    PyList_SET_ITEM(list_p, pos, Py_BuildValue("i", self.val[k]))
-{% elif type == 'INT64_t' %}
-                    PyList_SET_ITEM(list_p, pos, Py_BuildValue("l", self.val[k]))
-{% elif type == 'UINT32_t' %}
-                    PyList_SET_ITEM(list_p, pos, Py_BuildValue("I", self.val[k]))
-{% elif type == 'UINT64_t' %}
-                    PyList_SET_ITEM(list_p, pos, Py_BuildValue("k", self.val[k]))
-{% elif type == 'FLOAT32_t' %}
-                    PyList_SET_ITEM(list_p, pos, Py_BuildValue("f", self.val[k]))
-{% elif type == 'FLOAT64_t' %}
-                    PyList_SET_ITEM(list_p, pos, Py_BuildValue("d", self.val[k]))
-{% elif type == 'FLOAT128_t' %}
-                    # DOES NOT WORK!!!
-                    PyList_SET_ITEM(list_p, pos, PyFloat_FromDouble(self.val[k]))
-{% elif type == 'COMPLEX64_t' %}
-                    PyList_SET_ITEM(list_p, pos, PyComplex_FromDoubles(crealf(self.val[k]) , cimagf(self.val[k])))  # how to do this more efficiently?
-{% elif type == 'COMPLEX128_t' %}
-                    PyList_SET_ITEM(list_p, pos, PyComplex_FromDoubles(creal(self.val[k]), cimag(self.val[k])))
-{% elif type == 'COMPLEX256_t' %}
+
                     # DOES NOT WORK!!!
                     PyList_SET_ITEM(list_p, pos, PyComplex_FromDoubles(creall(self.val[k]), cimagl(self.val[k])))
-{% else %}
-YOU HAVE TO DEFINE OR CAST YOUR NEW UNRECOGNIZED TYPE
-{% endif %}
+
 
                     pos += 1
                     k = self.link[k]
@@ -707,9 +684,9 @@ YOU HAVE TO DEFINE OR CAST YOUR NEW UNRECOGNIZED TYPE
         """
         cdef:
             PyObject *list_p;     # the list that will hold the values
-            @index@ i, j, k
+            INT64_t i, j, k
             Py_ssize_t pos = 0         # position in list
-            @type@ val
+            COMPLEX256_t val
 
         list_p = PyList_New(self.nnz)
         if list_p == NULL:
@@ -722,31 +699,10 @@ YOU HAVE TO DEFINE OR CAST YOUR NEW UNRECOGNIZED TYPE
             while k != -1:
                 j = self.col[k]
                 val = self.val[k]
-{% if type == 'INT32_t' %}
-                PyList_SET_ITEM(list_p, pos, Py_BuildValue("((ii)i)", i, j, self.val[k]))
-{% elif type == 'INT64_t' %}
-                PyList_SET_ITEM(list_p, pos, Py_BuildValue("((ii)l)", i, j, self.val[k]))
-{% elif type == 'UINT32_t' %}
-                PyList_SET_ITEM(list_p, pos, Py_BuildValue("((ii)I)", i, j, self.val[k]))
-{% elif type == 'UINT64_t' %}
-                PyList_SET_ITEM(list_p, pos, Py_BuildValue("((ii)k)", i, j, self.val[k]))
-{% elif type == 'FLOAT32_t' %}
-                PyList_SET_ITEM(list_p, pos, Py_BuildValue("((ii)f)", i, j, self.val[k]))
-{% elif type == 'FLOAT64_t' %}
-                PyList_SET_ITEM(list_p, pos, Py_BuildValue("((ii)d)", i, j, self.val[k]))
-{% elif type == 'FLOAT128_t' %}
-                # DOES NOT WORK!!!
-                PyList_SET_ITEM(list_p, pos, Py_BuildValue("((ii)O)", i, j, PyFloat_FromDouble(self.val[k])))
-{% elif type == 'COMPLEX64_t' %}
-                PyList_SET_ITEM(list_p, pos, Py_BuildValue("((ii)O)", i, j, PyComplex_FromDoubles(crealf(self.val[k]) , cimagf(self.val[k]))))
-{% elif type == 'COMPLEX128_t' %}
-                PyList_SET_ITEM(list_p, pos, Py_BuildValue("((ii)O)", i, j, PyComplex_FromDoubles(creal(self.val[k]) , cimag(self.val[k]))))
-{% elif type == 'COMPLEX256_t' %}
+
                 # DOES NOT WORK!!!
                 PyList_SET_ITEM(list_p, pos, Py_BuildValue("((ii)O)", i, j, PyComplex_FromDoubles(creall(self.val[k]) , cimagl(self.val[k]))))
-{% else %}
-YOU HAVE TO DEFINE OR CAST YOUR NEW UNRECOGNIZED TYPE
-{% endif %}
+
 
                 pos += 1
 
@@ -765,47 +721,22 @@ YOU HAVE TO DEFINE OR CAST YOUR NEW UNRECOGNIZED TYPE
 
         cdef:
 
-{% if index == 'INT32_t' %}
-            cnp.ndarray[cnp.int32_t, ndim=1] a_row = cnp.PyArray_SimpleNew( 1, dmat, cnp.NPY_INT32)
-            cnp.ndarray[cnp.int32_t, ndim=1] a_col = cnp.PyArray_SimpleNew( 1, dmat, cnp.NPY_INT32)
-{% elif index == 'INT64_t' %}
+
             cnp.ndarray[cnp.int64_t, ndim=1] a_row = cnp.PyArray_SimpleNew( 1, dmat, cnp.NPY_INT64)
             cnp.ndarray[cnp.int64_t, ndim=1] a_col = cnp.PyArray_SimpleNew( 1, dmat, cnp.NPY_INT64)
-{% else %}
-YOU HAVE TO DEFINE WHAT HAPPENS WITH YOUR NEW INDEX TYPE
-{% endif %}
 
-{% if type == 'INT32_t' %}
-            cnp.ndarray[cnp.int32_t, ndim=1] a_val = cnp.PyArray_SimpleNew( 1, dmat, cnp.NPY_INT32)
-{% elif type == 'INT64_t' %}
-            cnp.ndarray[cnp.int64_t, ndim=1] a_val = cnp.PyArray_SimpleNew( 1, dmat, cnp.NPY_INT64)
-{% elif type == 'UINT32_t' %}
-            cnp.ndarray[cnp.uint32_t, ndim=1] a_val  = cnp.PyArray_SimpleNew( 1, dmat, cnp.NPY_UINT32)
-{% elif type == 'UINT64_t' %}
-            cnp.ndarray[cnp.uint64_t, ndim=1] a_val  = cnp.PyArray_SimpleNew( 1, dmat, cnp.NPY_UINT64)
-{% elif type == 'FLOAT32_t' %}
-            cnp.ndarray[cnp.float32_t, ndim=1] a_val  = cnp.PyArray_SimpleNew( 1, dmat, cnp.NPY_FLOAT32)
-{% elif type == 'FLOAT64_t' %}
-            cnp.ndarray[cnp.float64_t, ndim=1] a_val  = cnp.PyArray_SimpleNew( 1, dmat, cnp.NPY_FLOAT64)
-{% elif type == 'FLOAT128_t' %}
-            cnp.ndarray[cnp.npy_float128, ndim=1] a_val  = cnp.PyArray_SimpleNew( 1, dmat, cnp.NPY_FLOAT128)
-{% elif type == 'COMPLEX64_t' %}
-            cnp.ndarray[cnp.complex64_t, ndim=1] a_val = cnp.PyArray_SimpleNew( 1, dmat, cnp.NPY_COMPLEX64)
-{% elif type == 'COMPLEX128_t' %}
-            cnp.ndarray[cnp.complex128_t, ndim=1] a_val = cnp.PyArray_SimpleNew( 1, dmat, cnp.NPY_COMPLEX128)
-{% elif type == 'COMPLEX256_t' %}
+
+
             cnp.ndarray[cnp.npy_complex256, ndim=1] a_val = cnp.PyArray_SimpleNew( 1, dmat, cnp.NPY_COMPLEX256)
-{% else %}
-YOU HAVE TO DEFINE OR CAST YOUR NEW UNRECOGNIZED TYPE
-{% endif %}
 
-            @index@   *pi, *pj;   # Intermediate pointers to matrix data
-            @type@    *pv;
-            @index@   i, k, elem;
 
-        pi = <@index@ *> cnp.PyArray_DATA(a_row)
-        pj = <@index@ *> cnp.PyArray_DATA(a_col)
-        pv = <@type@ *> cnp.PyArray_DATA(a_val)
+            INT64_t   *pi, *pj;   # Intermediate pointers to matrix data
+            COMPLEX256_t    *pv;
+            INT64_t   i, k, elem;
+
+        pi = <INT64_t *> cnp.PyArray_DATA(a_row)
+        pj = <INT64_t *> cnp.PyArray_DATA(a_col)
+        pv = <COMPLEX256_t *> cnp.PyArray_DATA(a_val)
 
         elem = 0
         for i from 0 <= i < self.nrow:
@@ -827,13 +758,13 @@ YOU HAVE TO DEFINE OR CAST YOUR NEW UNRECOGNIZED TYPE
         """
         Return :math:`A * b`.
         """
-        return multiply_ll_mat_with_numpy_vector_@index@_@type@(self, B)
+        return multiply_ll_mat_with_numpy_vector_INT64_t_COMPLEX256_t(self, B)
 
     def matvec_transp(self, B):
         """
         Return :math:`A^t * b`.
         """
-        return multiply_transposed_ll_mat_with_numpy_vector_@index@_@type@(self, B)
+        return multiply_transposed_ll_mat_with_numpy_vector_INT64_t_COMPLEX256_t(self, B)
 
     def __mul__(self, B):
         """
@@ -846,11 +777,11 @@ YOU HAVE TO DEFINE OR CAST YOUR NEW UNRECOGNIZED TYPE
         """
         # CASES
         if PyLLSparseMatrix_Check(B):
-            return multiply_two_ll_mat_@index@_@type@(self, B)
+            return multiply_two_ll_mat_INT64_t_COMPLEX256_t(self, B)
             #raise NotImplementedError("Multiplication with this kind of object not implemented yet...")
         elif cnp.PyArray_Check(B):
             # test type
-            assert are_mixed_types_compatible(@type|type2enum@, B.dtype), "Multiplication only allowed with a Numpy compatible type (%s)!" % cysparse_to_numpy_type(@type|type2enum@)
+            assert are_mixed_types_compatible(COMPLEX256_T, B.dtype), "Multiplication only allowed with a Numpy compatible type (%s)!" % cysparse_to_numpy_type(COMPLEX256_T)
 
             if B.ndim == 2:
                 #return multiply_ll_mat_with_numpy_ndarray(self, B)
@@ -878,13 +809,13 @@ YOU HAVE TO DEFINE OR CAST YOUR NEW UNRECOGNIZED TYPE
         """
         # TODO: adapt to any numbers... and allow for additional parameters to control the output
         # TODO: don't create temporary matrix
-        cdef @index@ i, k, first = 1
+        cdef INT64_t i, k, first = 1
 
         print(self._matrix_description_before_printing(), file=OUT)
 
-        cdef @type@ *mat
-        cdef @index@ j
-        cdef @type@ val, ival
+        cdef COMPLEX256_t *mat
+        cdef INT64_t j
+        cdef COMPLEX256_t val, ival
 
         if not self.nnz:
             return
@@ -892,7 +823,7 @@ YOU HAVE TO DEFINE OR CAST YOUR NEW UNRECOGNIZED TYPE
         if print_big_matrices or (self.nrow <= LL_MAT_PPRINT_COL_THRESH and self.ncol <= LL_MAT_PPRINT_ROW_THRESH):
             # create linear vector presentation
 
-            mat = <@type@ *> PyMem_Malloc(self.nrow * self.ncol * sizeof(@type@))
+            mat = <COMPLEX256_t *> PyMem_Malloc(self.nrow * self.ncol * sizeof(COMPLEX256_t))
 
             if not mat:
                 raise MemoryError()
@@ -900,13 +831,9 @@ YOU HAVE TO DEFINE OR CAST YOUR NEW UNRECOGNIZED TYPE
             for i from 0 <= i < self.nrow:
                 for j from 0 <= j < self.ncol:
                     # EXPLICIT TYPE TESTS
-{% if type in integer_list %}
-                    mat[i* self.ncol + j] = 0
-{% elif type in complex_list %}
+
                     mat[i* self.ncol + j] = 0.0 + 0.0j
-{% else %}
-                    mat[i* self.ncol + j] = 0.0
-{% endif %}
+
                 k = self.root[i]
                 while k != -1:
                     mat[(i*self.ncol)+self.col[k]] = self.val[k]
@@ -916,11 +843,9 @@ YOU HAVE TO DEFINE OR CAST YOUR NEW UNRECOGNIZED TYPE
             for i from 0 <= i < self.nrow:
                 for j from 0 <= j < self.ncol:
                     val = mat[(i*self.ncol)+j]
-{% if type not in INTEGER_ELEMENT_TYPES %}
+
                     print('{:{width}.6f} '.format(val, width=width), end='', file=OUT)
-{% else %}
-                    print('{0:{width}d} '.format(val, width=width), end='', file=OUT)
-{% endif %}
+
                 print(file=OUT)
 
             PyMem_Free(mat)
