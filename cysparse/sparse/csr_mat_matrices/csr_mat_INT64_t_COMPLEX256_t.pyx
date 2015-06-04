@@ -11,7 +11,7 @@ from cysparse.sparse.s_mat cimport unexposed_value
 from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 from cpython cimport PyObject
 
-cdef class CSRSparseMatrix_@index@_@type@(ImmutableSparseMatrix_@index@_@type@):
+cdef class CSRSparseMatrix_INT64_t_COMPLEX256_t(ImmutableSparseMatrix_INT64_t_COMPLEX256_t):
     """
     Compressed Sparse Row Format matrix.
 
@@ -35,25 +35,24 @@ cdef class CSRSparseMatrix_@index@_@type@(ImmutableSparseMatrix_@index@_@type@):
 ########################################################################################################################
 # Factory methods
 ########################################################################################################################
-cdef MakeCSRSparseMatrix_@index@_@type@(@index@ nrow, @index@ ncol, @index@ nnz, @index@ * ind, @index@ * col, @type@ * val):
+cdef MakeCSRSparseMatrix_INT64_t_COMPLEX256_t(INT64_t nrow, INT64_t ncol, INT64_t nnz, INT64_t * ind, INT64_t * col, COMPLEX256_t * val):
     """
     Construct a CSRSparseMatrix object.
 
     Args:
-        nrow (@index@): Number of rows.
-        ncol (@index@): Number of columns.
-        nnz (@index@): Number of non-zeros.
-        ind (@index@ *): C-array with column indices pointers.
-        col  (@index@ *): C-array with column indices.
-        val  (@type@ *): C-array with values.
+        nrow (INT64_t): Number of rows.
+        ncol (INT64_t): Number of columns.
+        nnz (INT64_t): Number of non-zeros.
+        ind (INT64_t *): C-array with column indices pointers.
+        col  (INT64_t *): C-array with column indices.
+        val  (COMPLEX256_t *): C-array with values.
     """
 
 
-    csr_mat = CSRSparseMatrix_@index@_@type@(control_object=unexposed_value, nrow=nrow, ncol=ncol, nnz=nnz)
+    csr_mat = CSRSparseMatrix_INT64_t_COMPLEX256_t(control_object=unexposed_value, nrow=nrow, ncol=ncol, nnz=nnz)
 
     csr_mat.val = val
     csr_mat.ind = ind
     csr_mat.col = col
 
     return csr_mat
-

@@ -1,8 +1,8 @@
 from cysparse.types.cysparse_types cimport *
 
-from cysparse.sparse.s_mat_matrices.s_mat_@index@_@type@ cimport ImmutableSparseMatrix_@index@_@type@
+from cysparse.sparse.s_mat_matrices.s_mat_INT32_t_COMPLEX256_t cimport ImmutableSparseMatrix_INT32_t_COMPLEX256_t
 
-cdef class CSRSparseMatrix_@index@_@type@(ImmutableSparseMatrix_@index@_@type@):
+cdef class CSRSparseMatrix_INT32_t_COMPLEX256_t(ImmutableSparseMatrix_INT32_t_COMPLEX256_t):
     """
     Compressed Sparse Row Format matrix.
 
@@ -14,12 +14,12 @@ cdef class CSRSparseMatrix_@index@_@type@(ImmutableSparseMatrix_@index@_@type@):
     # Init/Free
     ####################################################################################################################
     cdef:
-        @type@ *  val		 # pointer to array of values
-        @index@ * col		 # pointer to array of indices
-        @index@ * ind		 # pointer to array of indices
+        COMPLEX256_t *  val		 # pointer to array of values
+        INT32_t * col		 # pointer to array of indices
+        INT32_t * ind		 # pointer to array of indices
 
         bint __col_indices_sorted_test_done  # we only test this once
         bint __col_indices_sorted            # are the column indices sorted in ascending order?
-        @index@ __first_row_not_ordered      # first row that is not ordered
+        INT32_t __first_row_not_ordered      # first row that is not ordered
 
-cdef MakeCSRSparseMatrix_@index@_@type@(@index@ nrow, @index@ ncol, @index@ nnz, @index@ * ind, @index@ * col, @type@ * val)
+cdef MakeCSRSparseMatrix_INT32_t_COMPLEX256_t(INT32_t nrow, INT32_t ncol, INT32_t nnz, INT32_t * ind, INT32_t * col, COMPLEX256_t * val)
