@@ -9,8 +9,8 @@ from cysparse.types.cysparse_types cimport *
 
 from cysparse.sparse.s_mat cimport unexposed_value
 
-from cysparse.sparse.s_mat_matrices.s_mat_@index@_@type@ cimport ImmutableSparseMatrix_@index@_@type@
-from cysparse.sparse.ll_mat_matrices.ll_mat_@index@_@type@ cimport LLSparseMatrix_@index@_@type@
+from cysparse.sparse.s_mat_matrices.s_mat_INT64_t_COMPLEX256_t cimport ImmutableSparseMatrix_INT64_t_COMPLEX256_t
+from cysparse.sparse.ll_mat_matrices.ll_mat_INT64_t_COMPLEX256_t cimport LLSparseMatrix_INT64_t_COMPLEX256_t
 
 from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 
@@ -18,7 +18,7 @@ cdef int CSC_MAT_PPRINT_ROW_THRESH = 500       # row threshold for choosing prin
 cdef int CSC_MAT_PPRINT_COL_THRESH = 20        # column threshold for choosing print format
 
 
-cdef class CSCSparseMatrix_@index@_@type@(ImmutableSparseMatrix_@index@_@type@):
+cdef class CSCSparseMatrix_INT64_t_COMPLEX256_t(ImmutableSparseMatrix_INT64_t_COMPLEX256_t):
     """
     Compressed Sparse Column Format matrix.
 
@@ -45,7 +45,7 @@ cdef class CSCSparseMatrix_@index@_@type@(ImmutableSparseMatrix_@index@_@type@):
         raise SyntaxError("Assign individual elements is not allowed")
 
     #                                            *** GET ***
-    cdef at(self, @index@ i, @index@ j):
+    cdef at(self, INT64_t i, INT64_t j):
         """
         Direct access to element ``(i, j)``.
 
@@ -56,7 +56,7 @@ cdef class CSCSparseMatrix_@index@_@type@(ImmutableSparseMatrix_@index@_@type@):
             :meth:`safe_at`.
 
         """
-        cdef @index@ k
+        cdef INT64_t k
 
         if self.is_symmetric:
             raise NotImplemented("Access to csr_mat(i, j) not (yet) implemented")
@@ -69,12 +69,10 @@ cdef class CSCSparseMatrix_@index@_@type@(ImmutableSparseMatrix_@index@_@type@):
         return 0.0
 
     # EXPLICIT TYPE TESTS
-{% if type in complex_list %}
+
     # this is needed as for the complex type, Cython's compiler crashes...
-    cdef @type@ safe_at(self, @index@ i, @index@ j) except *:
-{% else %}
-    cdef @type@ safe_at(self, @index@ i, @index@ j) except? 2:
-{% endif %}
+    cdef COMPLEX256_t safe_at(self, INT64_t i, INT64_t j) except *:
+
         """
         Return element ``(i, j)`` but with check for out of bounds indices.
 
@@ -103,8 +101,8 @@ cdef class CSCSparseMatrix_@index@_@type@(ImmutableSparseMatrix_@index@_@type@):
         if len(key) != 2:
             raise IndexError('Index tuple must be of length 2 (not %d)' % len(key))
 
-        cdef @index@ i = key[0]
-        cdef @index@ j = key[1]
+        cdef INT64_t i = key[0]
+        cdef INT64_t j = key[1]
 
         return self.safe_at(i, j)
 
@@ -123,11 +121,11 @@ cdef class CSCSparseMatrix_@index@_@type@(ImmutableSparseMatrix_@index@_@type@):
             OUT: Output stream that print (Python3) can print to.
         """
         # TODO: adapt to any numbers... and allow for additional parameters to control the output
-        cdef @index@ i, k, first = 1;
+        cdef INT64_t i, k, first = 1;
 
-        cdef @type@ *mat
-        cdef @index@ j
-        cdef @type@ val
+        cdef COMPLEX256_t *mat
+        cdef INT64_t j
+        cdef COMPLEX256_t val
 
         print('CSCSparseMatrix ([%d,%d]):' % (self.nrow, self.ncol), file=OUT)
 
@@ -137,20 +135,16 @@ cdef class CSCSparseMatrix_@index@_@type@(ImmutableSparseMatrix_@index@_@type@):
         if self.nrow <= CSC_MAT_PPRINT_COL_THRESH and self.ncol <= CSC_MAT_PPRINT_ROW_THRESH:
             # create linear vector presentation
             # TODO: Skip this creation
-            mat = <@type@ *> PyMem_Malloc(self.nrow * self.ncol * sizeof(@type@))
+            mat = <COMPLEX256_t *> PyMem_Malloc(self.nrow * self.ncol * sizeof(COMPLEX256_t))
 
             if not mat:
                 raise MemoryError()
 
             for j from 0 <= j < self.ncol:
                 for i from 0 <= i < self.nrow:
-{% if type in integer_list %}
-                    mat[j* self.nrow + i] = 0
-{% elif type in complex_list %}
+
                     mat[j* self.nrow + i] = 0.0 + 0.0j
-{% else %}
-                    mat[j* self.nrow + i] = 0.0
-{% endif %}
+
 
                 k = self.ind[j]
                 while k < self.ind[j+1]:
@@ -173,7 +167,7 @@ cdef class CSCSparseMatrix_@index@_@type@(ImmutableSparseMatrix_@index@_@type@):
     # DEBUG
     ####################################################################################################################
     def debug_print(self):
-        cdef @index@ i
+        cdef INT64_t i
         print("ind:")
         for i from 0 <= i < self.ncol + 1:
             print(self.ind[i], end=' ', sep=' ')
@@ -189,7 +183,7 @@ cdef class CSCSparseMatrix_@index@_@type@(ImmutableSparseMatrix_@index@_@type@):
             print(self.val[i], end=' == ', sep=' == ')
         print()
 
-    def set_row(self, @index@ i, @index@ val):
+    def set_row(self, INT64_t i, INT64_t val):
         self.row[i] = val
 
 
@@ -198,23 +192,22 @@ cdef class CSCSparseMatrix_@index@_@type@(ImmutableSparseMatrix_@index@_@type@):
 ########################################################################################################################
 # Factory methods
 ########################################################################################################################
-cdef MakeCSCSparseMatrix_@index@_@type@(@index@ nrow, @index@ ncol, @index@ nnz, @index@ * ind, @index@ * row, @type@ * val):
+cdef MakeCSCSparseMatrix_INT64_t_COMPLEX256_t(INT64_t nrow, INT64_t ncol, INT64_t nnz, INT64_t * ind, INT64_t * row, COMPLEX256_t * val):
     """
     Construct a CSCSparseMatrix object.
 
     Args:
-        nrow (@index@): Number of rows.
-        ncol (@index@): Number of columns.
-        nnz (@index@): Number of non-zeros.
-        ind (@index@ *): C-array with column indices pointers.
-        row  (@index@ *): C-array with row indices.
-        val  (@type@ *): C-array with values.
+        nrow (INT64_t): Number of rows.
+        ncol (INT64_t): Number of columns.
+        nnz (INT64_t): Number of non-zeros.
+        ind (INT64_t *): C-array with column indices pointers.
+        row  (INT64_t *): C-array with row indices.
+        val  (COMPLEX256_t *): C-array with values.
     """
-    csc_mat = CSCSparseMatrix_@index@_@type@(control_object=unexposed_value, nrow=nrow, ncol=ncol, nnz=nnz)
+    csc_mat = CSCSparseMatrix_INT64_t_COMPLEX256_t(control_object=unexposed_value, nrow=nrow, ncol=ncol, nnz=nnz)
 
     csc_mat.val = val
     csc_mat.ind = ind
     csc_mat.row = row
 
     return csc_mat
-
