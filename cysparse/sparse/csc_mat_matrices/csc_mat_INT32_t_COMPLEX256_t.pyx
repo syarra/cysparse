@@ -9,8 +9,8 @@ from cysparse.types.cysparse_types cimport *
 
 from cysparse.sparse.s_mat cimport unexposed_value
 
-from cysparse.sparse.s_mat_matrices.s_mat_@index@_@type@ cimport ImmutableSparseMatrix_@index@_@type@
-from cysparse.sparse.ll_mat_matrices.ll_mat_@index@_@type@ cimport LLSparseMatrix_@index@_@type@
+from cysparse.sparse.s_mat_matrices.s_mat_INT32_t_COMPLEX256_t cimport ImmutableSparseMatrix_INT32_t_COMPLEX256_t
+from cysparse.sparse.ll_mat_matrices.ll_mat_INT32_t_COMPLEX256_t cimport LLSparseMatrix_INT32_t_COMPLEX256_t
 
 ########################################################################################################################
 # Cython, NumPy import/cimport
@@ -33,11 +33,11 @@ cdef int CSC_MAT_PPRINT_COL_THRESH = 20        # column threshold for choosing p
 ########################################################################################################################
 # pxi files should come last (except for circular dependencies)
 
-include "csc_mat_kernel/csc_mat_multiplication_by_numpy_vector_kernel_@index@_@type@.pxi"
-include "csc_mat_helpers/csc_mat_multiplication_@index@_@type@.pxi"
+include "csc_mat_kernel/csc_mat_multiplication_by_numpy_vector_kernel_INT32_t_COMPLEX256_t.pxi"
+include "csc_mat_helpers/csc_mat_multiplication_INT32_t_COMPLEX256_t.pxi"
 
 
-cdef class CSCSparseMatrix_@index@_@type@(ImmutableSparseMatrix_@index@_@type@):
+cdef class CSCSparseMatrix_INT32_t_COMPLEX256_t(ImmutableSparseMatrix_INT32_t_COMPLEX256_t):
     """
     Compressed Sparse Column Format matrix.
 
@@ -64,7 +64,7 @@ cdef class CSCSparseMatrix_@index@_@type@(ImmutableSparseMatrix_@index@_@type@):
         raise SyntaxError("Assign individual elements is not allowed")
 
     #                                            *** GET ***
-    cdef at(self, @index@ i, @index@ j):
+    cdef at(self, INT32_t i, INT32_t j):
         """
         Direct access to element ``(i, j)``.
 
@@ -76,10 +76,10 @@ cdef class CSCSparseMatrix_@index@_@type@(ImmutableSparseMatrix_@index@_@type@):
 
         """
         cdef:
-            @index@ k
+            INT32_t k
             # for symmetric case
-            @index@ real_i
-            @index@ real_j
+            INT32_t real_i
+            INT32_t real_j
 
         if self.is_symmetric:
             # TODO: column indices are NOT necessarily sorted... what do we do about it?
@@ -104,12 +104,10 @@ cdef class CSCSparseMatrix_@index@_@type@(ImmutableSparseMatrix_@index@_@type@):
         return 0.0
 
     # EXPLICIT TYPE TESTS
-{% if type in complex_list %}
+
     # this is needed as for the complex type, Cython's compiler crashes...
-    cdef @type@ safe_at(self, @index@ i, @index@ j) except *:
-{% else %}
-    cdef @type@ safe_at(self, @index@ i, @index@ j) except? 2:
-{% endif %}
+    cdef COMPLEX256_t safe_at(self, INT32_t i, INT32_t j) except *:
+
         """
         Return element ``(i, j)`` but with check for out of bounds indices.
 
@@ -138,8 +136,8 @@ cdef class CSCSparseMatrix_@index@_@type@(ImmutableSparseMatrix_@index@_@type@):
         if len(key) != 2:
             raise IndexError('Index tuple must be of length 2 (not %d)' % len(key))
 
-        cdef @index@ i = key[0]
-        cdef @index@ j = key[1]
+        cdef INT32_t i = key[0]
+        cdef INT32_t j = key[1]
 
         return self.safe_at(i, j)
 
@@ -153,13 +151,13 @@ cdef class CSCSparseMatrix_@index@_@type@(ImmutableSparseMatrix_@index@_@type@):
         # TODO: write version when indices are sorted
         # TODO: refactor: act only on C-array? This would give the possibility to export NumPy array or C-array pointer
 
-        cdef @index@ diag_size = min(self.nrow, self.ncol)
-        cdef cnp.ndarray[cnp.@type|cysparse_type_to_numpy_c_type@, ndim=1, mode='c'] diagonal = np.zeros(diag_size, dtype=np.@type|cysparse_type_to_numpy_type@)
+        cdef INT32_t diag_size = min(self.nrow, self.ncol)
+        cdef cnp.ndarray[cnp.npy_complex256, ndim=1, mode='c'] diagonal = np.zeros(diag_size, dtype=np.complex256)
 
         # direct access to NumPy array
-        cdef @type@ * diagonal_data = <@type@ *> cnp.PyArray_DATA(diagonal)
+        cdef COMPLEX256_t * diagonal_data = <COMPLEX256_t *> cnp.PyArray_DATA(diagonal)
 
-        cdef @index@ j, k
+        cdef INT32_t j, k
 
         for j from 0 <= j < self.ncol:
 
@@ -182,14 +180,14 @@ cdef class CSCSparseMatrix_@index@_@type@(ImmutableSparseMatrix_@index@_@type@):
         """
         Return :math:`A * b`.
         """
-        return multiply_csc_mat_with_numpy_vector_@index@_@type@(self, B)
+        return multiply_csc_mat_with_numpy_vector_INT32_t_COMPLEX256_t(self, B)
 
     def matvec_transp(self, B):
         """
         Return :math:`A^t * b`.
         """
         pass
-        #return multiply_transposed_ll_mat_with_numpy_vector_@index@_@type@(self, B)
+        #return multiply_transposed_ll_mat_with_numpy_vector_INT32_t_COMPLEX256_t(self, B)
 
 
     ####################################################################################################################
@@ -207,11 +205,11 @@ cdef class CSCSparseMatrix_@index@_@type@(ImmutableSparseMatrix_@index@_@type@):
             OUT: Output stream that print (Python3) can print to.
         """
         # TODO: adapt to any numbers... and allow for additional parameters to control the output
-        cdef @index@ i, k, first = 1;
+        cdef INT32_t i, k, first = 1;
 
-        cdef @type@ *mat
-        cdef @index@ j
-        cdef @type@ val
+        cdef COMPLEX256_t *mat
+        cdef INT32_t j
+        cdef COMPLEX256_t val
 
         print('CSCSparseMatrix ([%d,%d]):' % (self.nrow, self.ncol), file=OUT)
 
@@ -221,20 +219,16 @@ cdef class CSCSparseMatrix_@index@_@type@(ImmutableSparseMatrix_@index@_@type@):
         if self.nrow <= CSC_MAT_PPRINT_COL_THRESH and self.ncol <= CSC_MAT_PPRINT_ROW_THRESH:
             # create linear vector presentation
             # TODO: Skip this creation
-            mat = <@type@ *> PyMem_Malloc(self.nrow * self.ncol * sizeof(@type@))
+            mat = <COMPLEX256_t *> PyMem_Malloc(self.nrow * self.ncol * sizeof(COMPLEX256_t))
 
             if not mat:
                 raise MemoryError()
 
             for i from 0 <= i < self.nrow:
                 for j from 0 <= j < self.ncol:
-{% if type in integer_list %}
-                    mat[i* self.nrow + j] = 0
-{% elif type in complex_list %}
+
                     mat[i* self.nrow + j] = 0.0 + 0.0j
-{% else %}
-                    mat[i* self.nrow + j] = 0.0
-{% endif %}
+
 
                     # BUG: this is non sense as it is computed for every different i
                     # TODO: rewrite this completely
@@ -293,15 +287,15 @@ cdef class CSCSparseMatrix_@index@_@type@(ImmutableSparseMatrix_@index@_@type@):
 
         # ind
         dim[0] = self.ncol + 1
-        ind_numpy_array = cnp.PyArray_SimpleNewFromData(1, dim, cnp.@index|cysparse_type_to_numpy_enum_type@, <@index@ *>self.ind)
+        ind_numpy_array = cnp.PyArray_SimpleNewFromData(1, dim, cnp.NPY_INT32, <INT32_t *>self.ind)
 
         # row
         dim[0] = self.nnz
-        row_numpy_array = cnp.PyArray_SimpleNewFromData(1, dim, cnp.@index|cysparse_type_to_numpy_enum_type@, <@index@ *>self.row)
+        row_numpy_array = cnp.PyArray_SimpleNewFromData(1, dim, cnp.NPY_INT32, <INT32_t *>self.row)
 
         # val
         dim[0] = self.nnz
-        val_numpy_array = cnp.PyArray_SimpleNewFromData(1, dim, cnp.@type|cysparse_type_to_numpy_enum_type@, <@type@ *>self.val)
+        val_numpy_array = cnp.PyArray_SimpleNewFromData(1, dim, cnp.NPY_COMPLEX256, <COMPLEX256_t *>self.val)
 
 
         return ind_numpy_array, row_numpy_array, val_numpy_array
@@ -310,7 +304,7 @@ cdef class CSCSparseMatrix_@index@_@type@(ImmutableSparseMatrix_@index@_@type@):
     # DEBUG
     ####################################################################################################################
     def debug_print(self):
-        cdef @index@ i
+        cdef INT32_t i
         print("ind:")
         for i from 0 <= i < self.ncol + 1:
             print(self.ind[i], end=' ', sep=' ')
@@ -326,7 +320,7 @@ cdef class CSCSparseMatrix_@index@_@type@(ImmutableSparseMatrix_@index@_@type@):
             print(self.val[i], end=' == ', sep=' == ')
         print()
 
-    def set_row(self, @index@ i, @index@ val):
+    def set_row(self, INT32_t i, INT32_t val):
         self.row[i] = val
 
 
@@ -335,23 +329,22 @@ cdef class CSCSparseMatrix_@index@_@type@(ImmutableSparseMatrix_@index@_@type@):
 ########################################################################################################################
 # Factory methods
 ########################################################################################################################
-cdef MakeCSCSparseMatrix_@index@_@type@(@index@ nrow, @index@ ncol, @index@ nnz, @index@ * ind, @index@ * row, @type@ * val, bint is_symmetric):
+cdef MakeCSCSparseMatrix_INT32_t_COMPLEX256_t(INT32_t nrow, INT32_t ncol, INT32_t nnz, INT32_t * ind, INT32_t * row, COMPLEX256_t * val, bint is_symmetric):
     """
     Construct a CSCSparseMatrix object.
 
     Args:
-        nrow (@index@): Number of rows.
-        ncol (@index@): Number of columns.
-        nnz (@index@): Number of non-zeros.
-        ind (@index@ *): C-array with column indices pointers.
-        row  (@index@ *): C-array with row indices.
-        val  (@type@ *): C-array with values.
+        nrow (INT32_t): Number of rows.
+        ncol (INT32_t): Number of columns.
+        nnz (INT32_t): Number of non-zeros.
+        ind (INT32_t *): C-array with column indices pointers.
+        row  (INT32_t *): C-array with row indices.
+        val  (COMPLEX256_t *): C-array with values.
     """
-    csc_mat = CSCSparseMatrix_@index@_@type@(control_object=unexposed_value, nrow=nrow, ncol=ncol, nnz=nnz, is_symmetric=is_symmetric)
+    csc_mat = CSCSparseMatrix_INT32_t_COMPLEX256_t(control_object=unexposed_value, nrow=nrow, ncol=ncol, nnz=nnz, is_symmetric=is_symmetric)
 
     csc_mat.val = val
     csc_mat.ind = ind
     csc_mat.row = row
 
     return csc_mat
-

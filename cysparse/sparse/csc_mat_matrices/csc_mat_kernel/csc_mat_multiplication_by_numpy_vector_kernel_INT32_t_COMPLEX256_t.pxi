@@ -8,8 +8,8 @@
 ###########################################
 # C-contiguous, no symmetric
 ###########################################
-cdef void multiply_csc_mat_with_numpy_vector_kernel_@index@_@type@(@index@ m, @index@ n, @type@ *x, @type@ *y,
-         @type@ *val, @index@ *row, @index@ *ind):
+cdef void multiply_csc_mat_with_numpy_vector_kernel_INT32_t_COMPLEX256_t(INT32_t m, INT32_t n, COMPLEX256_t *x, COMPLEX256_t *y,
+         COMPLEX256_t *val, INT32_t *row, INT32_t *ind):
     """
     Compute ``y = A * x``.
 
@@ -28,20 +28,17 @@ cdef void multiply_csc_mat_with_numpy_vector_kernel_@index@_@type@(@index@ m, @i
         ind: C-contiguous C-array corresponding to vector ``A.ind``.
     """
     cdef:
-        @type@ s
-        @index@ i, j, k
+        COMPLEX256_t s
+        INT32_t i, j, k
 
     # init numpy array
     for i from 0 <= i < m:
-{% if type not in complex_list %}
-        y[i] = <@type@>0.0
-{% else %}
-        y[i] = <@type@>(0.0+0.0j)
-{% endif %}
+
+        y[i] = <COMPLEX256_t>(0.0+0.0j)
+
 
     # multiplication, column-wise...
     for j from 0 <= j < n:
         for k from ind[j]<= k < ind[j+1]:
             i = row[k]
             y[i] += val[k] * x[i]
-
