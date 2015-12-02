@@ -43,3 +43,5 @@ def make_logger(cysparse_config):
     # add ch and fh to logger
     logger.addHandler(ch)
     logger.addHandler(fh)
+
+    return logger
