@@ -1,4 +1,4 @@
-cimport cysparse.cysparse_types.cysparse_types as cp_types
+cimport cysparse.common_types.cysparse_types as cp_types
 cimport numpy as cnp
 #from numpy.math cimport INFINITY
 import numpy as np
