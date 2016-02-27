@@ -29,8 +29,6 @@ from scipy.sparse import lil_matrix
 ########################################################################################################################
 # Helpers
 ########################################################################################################################
-# the same function could be used for all the matrices...
-
 def construct_random_matrices(list_of_matrices, n, nbr_elements):
 
     nbr_added_elements = 0
@@ -51,34 +49,6 @@ def construct_random_matrices(list_of_matrices, n, nbr_elements):
             matrix[random_index1, random_index2] = random_element
 
         nbr_added_elements += 1
-
-
-def construct_cysparse_matrix(n, nbr_elements):
-    # int is 32 bits on my machine
-    A = LLSparseMatrix(size=n, size_hint=nbr_elements, itype=INT32_T, dtype=FLOAT64_T)
-
-    for i in xrange(nbr_elements):
-        A[i % n, (2 * i + 1) % n] = i / 3
-
-    return A
-
-
-def construct_pysparse_matrix(n, nbr_elements):
-    A = spmatrix.ll_mat(n, n, nbr_elements)
-
-    for i in xrange(nbr_elements):
-        A[i % n, (2 * i + 1) % n] = i / 3
-
-    return A
-
-
-def construct_scipy_sparse_matrix(n, nbr_elements):
-    A = lil_matrix((n, n), dtype=np.float64)
-
-    for i in xrange(nbr_elements):
-        A[i % n, (2 * i + 1) % n] = i / 3
-
-    return A
 
 
 ########################################################################################################################
@@ -127,7 +97,7 @@ class LLMatMatVecBenchmark(benchmark.Benchmark):
         return
 
     def test_cysparse2(self):
-        self.A_c.matvec(self.v)
+        self.w_c2 = self.A_c.matvec(self.v)
         return
 
     def test_scipy_sparse(self):
@@ -135,7 +105,7 @@ class LLMatMatVecBenchmark(benchmark.Benchmark):
         return
 
     def test_scipy_sparse2(self):
-        self.A_s._mul_vector(self.v)
+        self.w_s2 = self.A_s._mul_vector(self.v)
 
 
 class LLMatMatVecBenchmark_2(LLMatMatVecBenchmark):
@@ -150,9 +120,16 @@ class LLMatMatVecBenchmark_2(LLMatMatVecBenchmark):
         self.nbr_elements = 10000
         self.size = 100000
 
-        self.A_c = construct_cysparse_matrix(n=self.size, nbr_elements=self.nbr_elements)
-        self.A_p = construct_pysparse_matrix(n=self.size, nbr_elements=self.nbr_elements)
-        self.A_s = construct_scipy_sparse_matrix(n=self.size, nbr_elements=self.nbr_elements)
+        self.A_c = LLSparseMatrix(size=self.size, size_hint=self.nbr_elements, itype=INT32_T, dtype=FLOAT64_T)
+        self.A_p = spmatrix.ll_mat(self.size, self.size, self.nbr_elements)
+        self.A_s = lil_matrix((self.size, self.size), dtype=np.float64)
+
+        self.list_of_matrices = []
+        self.list_of_matrices.append(self.A_c)
+        self.list_of_matrices.append(self.A_p)
+        self.list_of_matrices.append(self.A_s)
+
+        construct_random_matrices(self.list_of_matrices, self.size, self.nbr_elements)
 
         self.v = np.arange(0, self.size, dtype=np.float64)
 
@@ -169,9 +146,16 @@ class LLMatMatVecBenchmark_3(LLMatMatVecBenchmark):
         self.nbr_elements = 100000
         self.size = 1000000
 
-        self.A_c = construct_cysparse_matrix(n=self.size, nbr_elements=self.nbr_elements)
-        self.A_p = construct_pysparse_matrix(n=self.size, nbr_elements=self.nbr_elements)
-        self.A_s = construct_scipy_sparse_matrix(n=self.size, nbr_elements=self.nbr_elements)
+        self.A_c = LLSparseMatrix(size=self.size, size_hint=self.nbr_elements, itype=INT32_T, dtype=FLOAT64_T)
+        self.A_p = spmatrix.ll_mat(self.size, self.size, self.nbr_elements)
+        self.A_s = lil_matrix((self.size, self.size), dtype=np.float64)
+
+        self.list_of_matrices = []
+        self.list_of_matrices.append(self.A_c)
+        self.list_of_matrices.append(self.A_p)
+        self.list_of_matrices.append(self.A_s)
+
+        construct_random_matrices(self.list_of_matrices, self.size, self.nbr_elements)
 
         self.v = np.arange(0, self.size, dtype=np.float64)
 
@@ -179,18 +163,25 @@ class LLMatMatVecBenchmark_3(LLMatMatVecBenchmark):
 class LLMatMatVecBenchmark_4(LLMatMatVecBenchmark):
 
 
-    label = "matvec with 500,000 elements and size = 1,000,000"
+    label = "matvec with 5000 elements and size = 1,000,000"
     each = 100
 
 
     def setUp(self):
 
-        self.nbr_elements = 500000
+        self.nbr_elements = 5000
         self.size = 1000000
 
-        self.A_c = construct_cysparse_matrix(n=self.size, nbr_elements=self.nbr_elements)
-        self.A_p = construct_pysparse_matrix(n=self.size, nbr_elements=self.nbr_elements)
-        self.A_s = construct_scipy_sparse_matrix(n=self.size, nbr_elements=self.nbr_elements)
+        self.A_c = LLSparseMatrix(size=self.size, size_hint=self.nbr_elements, itype=INT32_T, dtype=FLOAT64_T)
+        self.A_p = spmatrix.ll_mat(self.size, self.size, self.nbr_elements)
+        self.A_s = lil_matrix((self.size, self.size), dtype=np.float64)
+
+        self.list_of_matrices = []
+        self.list_of_matrices.append(self.A_c)
+        self.list_of_matrices.append(self.A_p)
+        self.list_of_matrices.append(self.A_s)
+
+        construct_random_matrices(self.list_of_matrices, self.size, self.nbr_elements)
 
         self.v = np.arange(0, self.size, dtype=np.float64)
 
