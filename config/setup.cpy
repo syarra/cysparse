@@ -364,9 +364,12 @@ ext_modules = base_ext + sparse_ext
 ########################################################################################################################
 # PACKAGE PREPARATION FOR EXCLUSIVE C EXTENSIONS
 ########################################################################################################################
-# We only use the C files **without** Cython. In fact, Cython doesn't need to be installed.
+install_requires = ['numpy']
 if not use_cython:
+    # We only use the C files **without** Cython. In fact, Cython doesn't need to be installed.
     prepare_Cython_extensions_as_C_extensions(ext_modules)
+else:
+    install_requires.append('Cython')
 
 ########################################################################################################################
 # PACKAGE SPECIFICATIONS
@@ -411,7 +414,7 @@ setup_args = {
     'download_url' : "https://github.com/Funartech/cysparse",
     'license' : 'LGPL',
     'classifiers' : filter(None, CLASSIFIERS.split('\n')),
-    'install_requires' : ['numpy', 'Cython'],
+    'install_requires' : install_requires, 
     #ext_package' : 'cysparse', <- doesn't work with pxd files...
     #ext_modules = cythonize(ext_modules), <- doesn't work with our settings... (combinations of .pxi and .pxd files)
     'ext_modules' : ext_modules,
