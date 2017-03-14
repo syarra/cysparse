@@ -97,7 +97,7 @@ is_64bits = sys.maxsize > 2**32
 
 # read cysparse.cfg
 cysparse_config = configparser.SafeConfigParser()
-cysparse_config.read('cysparse.cfg')
+cysparse_config.read('site.cfg')
 
 
 # index type for LLSparseMatrix
