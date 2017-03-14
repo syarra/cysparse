@@ -6,6 +6,7 @@ __pycache__/
 *.cp[xyd]
 
 cysparse_generate_code.log
+generate_code.py
 site.cfg
 /build/*
 config/*
