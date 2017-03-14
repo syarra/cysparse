@@ -8,6 +8,7 @@ __pycache__/
 cysparse_generate_code.log
 site.cfg
 /build/*
+config/*
 /.idea/*
 /.tox/*
 /docs/users/build/*
