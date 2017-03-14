@@ -60,7 +60,7 @@ def prepare_Cython_extensions_as_C_extensions(extensions):
 ###################################################################s####################################################
 # INIT
 ########################################################################################################################
-cysparse_config_file = 'cysparse.cfg'
+cysparse_config_file = 'site.cfg'
 cysparse_config = configparser.SafeConfigParser()
 cysparse_config.read(cysparse_config_file)
 

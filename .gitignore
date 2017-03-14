@@ -3,9 +3,13 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
+*.c
+*.pyx
+*.pxd
+*.pxi
 
 cysparse_generate_code.log
-cysparse.cfg
+site.cfg
 /build/*
 /.idea/*
 /.tox/*
