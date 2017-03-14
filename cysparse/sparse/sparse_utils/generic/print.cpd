@@ -1,7 +1,0 @@
-@cython_compiler_directives@
-from cysparse.common_types.cysparse_types cimport *
-
-
-cdef element_to_string_@type@(@type@ v, int cell_width=?)
-cdef conjugated_element_to_string_@type@(@type@ v, int cell_width=?)
-cdef empty_to_string_@type@(int cell_width=?)

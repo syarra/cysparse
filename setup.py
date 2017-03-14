@@ -60,7 +60,7 @@ def prepare_Cython_extensions_as_C_extensions(extensions):
 ###################################################################s####################################################
 # INIT
 ########################################################################################################################
-cysparse_config_file = 'cysparse.cfg'
+cysparse_config_file = 'site.cfg'
 cysparse_config = configparser.SafeConfigParser()
 cysparse_config.read(cysparse_config_file)
 
@@ -92,17 +92,7 @@ ext_params['include_dirs'] = include_dirs
 ext_params['extra_compile_args'] = ['-std=c99', '-Wno-unused-function']
 ext_params['extra_link_args'] = []
 
-if not use_debug_symbols:
-    key_to_modify = None
-    try:
-        key_to_modify = 'PY_CORE_CFLAGS'
-        sysconfig._config_vars[key_to_modify]
-    except:
-        key_to_modify = 'PY_CFLAGS'
-    cflags = sysconfig._config_vars[key_to_modify]
-    cflags = cflags.replace(' -g ', ' ')
-    sysconfig._config_vars[key_to_modify] = cflags
-else:
+if use_debug_symbols:
     ext_params['extra_compile_args'].append("-g")
     ext_params['extra_link_args'].append("-g")
 
@@ -1101,9 +1091,12 @@ ext_modules = base_ext + sparse_ext
 ########################################################################################################################
 # PACKAGE PREPARATION FOR EXCLUSIVE C EXTENSIONS
 ########################################################################################################################
-# We only use the C files **without** Cython. In fact, Cython doesn't need to be installed.
+install_requires = ['numpy']
 if not use_cython:
+    # We only use the C files **without** Cython. In fact, Cython doesn't need to be installed.
     prepare_Cython_extensions_as_C_extensions(ext_modules)
+else:
+    install_requires.append('Cython')
 
 ########################################################################################################################
 # PACKAGE SPECIFICATIONS
@@ -1148,7 +1141,7 @@ setup_args = {
     'download_url' : "https://github.com/Funartech/cysparse",
     'license' : 'LGPL',
     'classifiers' : filter(None, CLASSIFIERS.split('\n')),
-    'install_requires' : ['numpy', 'Cython'],
+    'install_requires' : install_requires, 
     #ext_package' : 'cysparse', <- doesn't work with pxd files...
     #ext_modules = cythonize(ext_modules), <- doesn't work with our settings... (combinations of .pxi and .pxd files)
     'ext_modules' : ext_modules,

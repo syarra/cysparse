@@ -3,14 +3,13 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
-*.c
-*.pyx
-*.pxd
-*.pxi
+*.cp[xyd]
 
 cysparse_generate_code.log
+generate_code.py
 site.cfg
 /build/*
+config/*
 /.idea/*
 /.tox/*
 /docs/users/build/*
